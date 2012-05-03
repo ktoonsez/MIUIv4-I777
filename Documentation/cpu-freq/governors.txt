@@ -229,7 +229,22 @@ go_maxspeed_load: The CPU load at which to ramp to max speed.  Default
 is 85.
 
 timer_rate: Sample rate for reevaluating cpu load when the system is
+<<<<<<< HEAD
 not idle.  Default is 30000 uS.
+=======
+not idle.  Default is 20000 uS.
+
+input_boost: If non-zero, boost speed of all CPUs to hispeed_freq on
+touchscreen activity.  Default is 0.
+
+boost: If non-zero, immediately boost speed of all CPUs to at least
+hispeed_freq until zero is written to this attribute.  If zero, allow
+CPU speeds to drop below hispeed_freq according to load as usual.
+
+boostpulse: Immediately boost speed of all CPUs to hispeed_freq for
+min_sample_time, after which speeds are allowed to drop below
+hispeed_freq according to load as usual.
+>>>>>>> 9f4958d... cpufreq: interactive: add boost pulse interface
 
 3. The Governor Interface in the CPUfreq Core
 =============================================
