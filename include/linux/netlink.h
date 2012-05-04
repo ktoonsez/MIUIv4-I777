@@ -26,6 +26,7 @@
 #define NETLINK_ECRYPTFS	19
 #define NETLINK_RDMA		20
 
+
 #define MAX_LINKS 32		
 
 struct sockaddr_nl {
@@ -269,3 +270,4 @@ extern void netlink_set_nonroot(int protocol, unsigned flag);
 #endif /* __KERNEL__ */
 
 #endif	/* __LINUX_NETLINK_H */
+
