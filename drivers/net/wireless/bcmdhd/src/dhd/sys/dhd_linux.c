@@ -1613,9 +1613,6 @@ dhd_rx_frame(dhd_pub_t *dhdp, int ifidx, void *pktbuf, int numpkt, uint8 chan)
 	int i;
 	dhd_if_t *ifp;
 	wl_event_msg_t event;
-<<<<<<< HEAD
-	int tout = DHD_PACKET_TIMEOUT;
-=======
 	int tout = DHD_PACKET_TIMEOUT_MS;
 #ifdef DHD_RX_DUMP
 #ifdef DHD_RX_FULL_DUMP
@@ -1624,7 +1621,6 @@ dhd_rx_frame(dhd_pub_t *dhdp, int ifidx, void *pktbuf, int numpkt, uint8 chan)
 	char *dump_data;
 	uint16 protocol;
 #endif /* DHD_RX_DUMP */
->>>>>>> ad7e371... net: wireless: bcmdhd: Driver update from 250S sources
 
 
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
@@ -1775,11 +1771,7 @@ dhd_rx_frame(dhd_pub_t *dhdp, int ifidx, void *pktbuf, int numpkt, uint8 chan)
 			if (event.event_type == WLC_E_BTA_HCI_EVENT) {
 				dhd_bta_doevt(dhdp, data, event.datalen);
 			}
-<<<<<<< HEAD
-			tout = DHD_EVENT_TIMEOUT;
-=======
 			tout = DHD_EVENT_TIMEOUT_MS;
->>>>>>> ad7e371... net: wireless: bcmdhd: Driver update from 250S sources
 #endif /* WLBTAMP */
 		}
 
@@ -2318,11 +2310,7 @@ dhd_ioctl_entry(struct net_device *net, struct ifreq *ifr, int cmd)
 	/* send to dongle only if we are not waiting for reload already */
 	if (dhd->pub.hang_was_sent) {
 		DHD_ERROR(("%s: HANG was sent up earlier\n", __FUNCTION__));
-<<<<<<< HEAD
-		DHD_OS_WAKE_LOCK_TIMEOUT_ENABLE(&dhd->pub, DHD_EVENT_TIMEOUT);
-=======
 		DHD_OS_WAKE_LOCK_TIMEOUT_ENABLE(&dhd->pub, DHD_EVENT_TIMEOUT_MS);
->>>>>>> ad7e371... net: wireless: bcmdhd: Driver update from 250S sources
 		DHD_OS_WAKE_UNLOCK(&dhd->pub);
 		return OSL_ERROR(BCME_DONGLE_DOWN);
 	}
@@ -2681,19 +2669,10 @@ dhd_open(struct net_device *net)
 #if defined(WL_CFG80211)
 		DHD_ERROR(("\n%s\n", dhd_version));
 		if (!dhd_download_fw_on_driverload) {
-<<<<<<< HEAD
-			wl_android_wifi_on(net);
-		} else {
-			if (fw_changed) {
-				wl_android_wifi_off(net);
-				msleep(300);
-				wl_android_wifi_on(net);
-=======
 			ret = wl_android_wifi_on(net);
 			if (ret != 0) {
 				DHD_ERROR(("wl_android_wifi_on failed (%d)\n", ret));
 				goto exit;
->>>>>>> ad7e371... net: wireless: bcmdhd: Driver update from 250S sources
 			}
 		} else {
 			if (fw_changed || suspend_power_off) {
@@ -5005,11 +4984,8 @@ int net_os_send_hang_message(struct net_device *dev)
 #endif
 #if defined(WL_CFG80211)
 			ret = wl_cfg80211_hang(dev, WLAN_REASON_UNSPECIFIED);
-<<<<<<< HEAD
-=======
 			dev_close(dev);
 			dev_open(dev);
->>>>>>> ad7e371... net: wireless: bcmdhd: Driver update from 250S sources
 #endif
 		}
 	}
@@ -5148,11 +5124,7 @@ int dhd_os_wake_lock_timeout(dhd_pub_t *pub)
 #ifdef CONFIG_HAS_WAKELOCK
 		if (dhd->wakelock_timeout_enable)
 			wake_lock_timeout(&dhd->wl_rxwake,
-<<<<<<< HEAD
-				dhd->wakelock_timeout_enable * HZ);
-=======
 				msecs_to_jiffies(dhd->wakelock_timeout_enable));
->>>>>>> ad7e371... net: wireless: bcmdhd: Driver update from 250S sources
 #endif
 		dhd->wakelock_timeout_enable = 0;
 		spin_unlock_irqrestore(&dhd->wakelock_spinlock, flags);
