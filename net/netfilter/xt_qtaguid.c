@@ -26,6 +26,10 @@
 #include <net/tcp.h>
 #include <net/udp.h>
 
+#if defined(CONFIG_IP6_NF_IPTABLES) || defined(CONFIG_IP6_NF_IPTABLES_MODULE)
+#include <linux/netfilter_ipv6/ip6_tables.h>
+#endif
+
 #include <linux/netfilter/xt_socket.h>
 #include "xt_qtaguid_internal.h"
 #include "xt_qtaguid_print.h"
@@ -1398,7 +1402,7 @@ static void if_tag_stat_update(const char *ifname, uid_t uid,
 	struct data_counters *uid_tag_counters;
 	struct sock_tag *sock_tag_entry;
 	struct iface_stat *iface_entry;
-	struct tag_stat *new_tag_stat;
+	struct tag_stat *new_tag_stat = NULL;
 	MT_DEBUG("qtaguid: if_tag_stat_update(ifname=%s "
 		"uid=%u sk=%p dir=%d proto=%d bytes=%d)\n",
 		 ifname, uid, sk, direction, proto, bytes);
@@ -1463,8 +1467,19 @@ static void if_tag_stat_update(const char *ifname, uid_t uid,
 	}
 
 	if (acct_tag) {
+		/* Create the child {acct_tag, uid_tag} and hook up parent. */
 		new_tag_stat = create_if_tag_stat(iface_entry, tag);
 		new_tag_stat->parent_counters = uid_tag_counters;
+	} else {
+		/*
+		 * For new_tag_stat to be still NULL here would require:
+		 *  {0, uid_tag} exists
+		 *  and {acct_tag, uid_tag} doesn't exist
+		 *  AND acct_tag == 0.
+		 * Impossible. This reassures us that new_tag_stat
+		 * below will always be assigned.
+		 */
+		BUG_ON(!new_tag_stat);
 	}
 	tag_stat_update(new_tag_stat, direction, proto, bytes);
 	spin_unlock_bh(&iface_entry->tag_stat_list_lock);
@@ -1714,15 +1729,15 @@ static void account_for_uid(const struct sk_buff *skb,
 	} else if (unlikely(!el_dev->name)) {
 		pr_info("qtaguid[%d]: no dev->name?!!\n", par->hooknum);
 	} else {
-		MT_DEBUG("qtaguid[%d]: dev name=%s type=%d\n",
-			 par->hooknum,
-			 el_dev->name,
-			 el_dev->type);
+		int proto = ipx_proto(skb, par);
+		MT_DEBUG("qtaguid[%d]: dev name=%s type=%d fam=%d proto=%d\n",
+			 par->hooknum, el_dev->name, el_dev->type,
+			 par->family, proto);
 
 		if_tag_stat_update(el_dev->name, uid,
 				skb->sk ? skb->sk : alternate_sk,
 				par->in ? IFS_RX : IFS_TX,
-				ip_hdr(skb)->protocol, skb->len);
+				proto, skb->len);
 	}
 }
 
@@ -1781,8 +1796,8 @@ static bool qtaguid_mt(const struct sk_buff *skb, struct xt_action_param *par)
 	} else {
 		atomic64_inc(&qtu_events.match_found_sk);
 	}
-	MT_DEBUG("qtaguid[%d]: sk=%p got_sock=%d proto=%d\n",
-		par->hooknum, sk, got_sock, ip_hdr(skb)->protocol);
+	MT_DEBUG("qtaguid[%d]: sk=%p got_sock=%d fam=%d proto=%d\n",
+		 par->hooknum, sk, got_sock, par->family, ipx_proto(skb, par));
 	if (sk != NULL) {
 		MT_DEBUG("qtaguid[%d]: sk=%p->sk_socket=%p->file=%p\n",
 			par->hooknum, sk, sk->sk_socket,
@@ -2964,3 +2979,4 @@ MODULE_ALIAS("ipt_owner");
 MODULE_ALIAS("ip6t_owner");
 MODULE_ALIAS("ipt_qtaguid");
 MODULE_ALIAS("ip6t_qtaguid");
+
