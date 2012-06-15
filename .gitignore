@@ -11,6 +11,8 @@
 #
 .*
 *.o
+*.o.*
+*.a
 *.ko
 *.so
 *.so.dbg
@@ -54,8 +56,6 @@ scripts/kconfig/lex.zconf.c
 scripts/kconfig/zconf.hash.c
 scripts/kconfig/zconf.tab.c
 scripts/mod/elfconfig.h
-arch/arm/boot/compressed/piggy.gzip
-kernel/config_data.h
 
 #
 # Top-level generic files
