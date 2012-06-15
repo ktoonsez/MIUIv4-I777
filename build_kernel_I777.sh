@@ -7,7 +7,7 @@ mkdir -p kernel/usr/initramfs
 echo "Remove old initramfs dir"
 rm -rf kernel/usr/initramfs/*
 echo "Copy new initramfs dir"
-cp -R miui_initramfs/* kernel/usr/initramfs
+cp -R ../miui_initramfs/* kernel/usr/initramfs
 #echo "Remove .o files"
 #rm -rf kernel/*.o
 echo "chmod initramfs dir"

@@ -108,6 +108,7 @@ GTAGS
 # files for XZ compression
 arch/arm/boot/compressed/ashldi3.S
 arch/arm/boot/compressed/piggy.xzkern
+arch/arm/boot/compressed/piggy.gzip
 
 *.orig
 *~
